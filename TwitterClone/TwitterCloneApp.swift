@@ -6,12 +6,24 @@
 //
 
 import SwiftUI
+import Firebase
 
 @main
 struct TwitterCloneApp: App {
+    @AppStorage("isDarkModeEnabled") private var isDarkModelEnabled: Bool = false
+//    @StateObject var viewModel = AuthViewModel()
+    
+    init(){
+        FirebaseApp.configure()
+    }
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationView{
+              ContentView()
+//              ProfileSelectorView()
+            }
+                .environment(\.appColorScheme, isDarkModelEnabled ? .dark: .light)
+                .environmentObject(AuthViewModel())
         }
     }
 }
