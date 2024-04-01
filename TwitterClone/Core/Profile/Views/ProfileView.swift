@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ProfileView: View {
     @Environment(\.dismiss) private var dismiss
+   
     var body: some View {
         VStack(alignment: .leading){
             headerView
@@ -55,7 +56,7 @@ extension ProfileView {
                 })
                 
                 Circle()
-                    .frame(width: 72, height: 72)
+                .frame(width: 72, height: 72)
                 .offset(x:16, y: 24)
             }
         })
@@ -92,85 +93,94 @@ struct ProfileButton: View {
 }
 
 struct UserInfo: View {
+    @EnvironmentObject var viewModel: AuthViewModel
     var body: some View {
-        VStack(alignment:.leading, spacing: 4){
-            HStack{
-                Text("Bruce Lee")
-                    .font(.title2).bold()
-                //Verification Badge
+        if let user = viewModel.currentUser{
+            VStack(alignment:.leading, spacing: 4){
+                HStack{
+                    Text(user.fullname)
+                        .font(.title2).bold()
+                    //Verification Badge
+                    
+                    Image(systemName: "checkmark.seal.fill")
+                        .foregroundStyle(Color(.systemYellow))
+                }
+                Text("@\(user.username)")
+                    .font(.subheadline)
+                    .foregroundStyle(.gray)
                 
-                Image(systemName: "checkmark.seal.fill")
-                    .foregroundStyle(Color(.systemYellow))
+                //Bio
+                
+                Text(user.bio)
+                    .font(.subheadline).bold()
+                    .padding(.vertical)
             }
-            Text("@brucelee")
-                .font(.subheadline)
-                .foregroundStyle(.gray)
-            
-            //Bio
-            
-            Text("Your Favorite")
-                .font(.subheadline).bold()
-                .padding(.vertical)
+            .padding(.horizontal)
         }
-        .padding(.horizontal)
     }
 }
 
 struct ProfessionalPart: View {
+    @EnvironmentObject var viewModel: AuthViewModel
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack{
-                Image(systemName: "latch.2.case")
-                Text("Entertainment & Recreation")
+        if let user =  viewModel.currentUser{
+            VStack(alignment: .leading, spacing: 4) {
+                HStack{
+                    Image(systemName: "latch.2.case")
+                    Text(user.industry)
+                        .font(.subheadline).bold()
+                        .foregroundStyle(.gray)
+                    Spacer()
+                    
+                    //Location
+                    Button {
+                        
+                    } label: {
+                        Image(systemName: "location")
+                        Text(user.location)
+                    }
                     .font(.subheadline).bold()
                     .foregroundStyle(.gray)
-                Spacer()
-                
-                //Location
-                Button {
                     
-                } label: {
-                    Image(systemName: "location")
-                    Text("Germany")
+                    Spacer()
+                    
                 }
-                .font(.subheadline).bold()
-                .foregroundStyle(.gray)
-                
-                Spacer()
-                
             }
+            .padding(.horizontal)
+            .padding(.bottom, 2)
         }
-        .padding(.horizontal)
-        .padding(.bottom, 2)
     }
 }
 
 struct ProfileLocAndLink: View {
+    @EnvironmentObject var viewModel: AuthViewModel
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack{
-                Button {
-                    
-                } label: {
-                    Image(systemName: "link")
-                    Text("kick.com")
-                        .foregroundStyle(.blue)
-                }
-                .font(.subheadline).bold()
-                .foregroundStyle(.gray)
-                Spacer()
-                
-                //Join Date
-                Image(systemName: "calendar")
-                Text("Joined August 2023")
+        if let user = viewModel.currentUser{
+            VStack(alignment: .leading, spacing: 4) {
+                HStack{
+                    Button {
+                        
+                    } label: {
+                        Image(systemName: "link")
+                        Text(user.website)
+                            .foregroundStyle(.blue)
+                    }
                     .font(.subheadline).bold()
-                    .foregroundStyle(.gray)
-                Spacer()
-                
+                    .foregroundStyle(.black)
+                    Spacer()
+                    
+                    //Join Date
+                    Image(systemName: "birthday.cake")
+                    Text(user.dateOfBirth)
+                        .font(.subheadline).bold()
+                        .foregroundStyle(.gray)
+                    Spacer()
+                    
+                }
             }
+            .padding(.horizontal)
+            .padding(.bottom, 2)
         }
-        .padding(.horizontal)
-        .padding(.bottom, 2)
     }
 }
 

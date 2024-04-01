@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct ContentView: View {
     @EnvironmentObject var viewModel: AuthViewModel
@@ -58,6 +59,7 @@ extension View {
 struct MainInterFaceView: View {
     @State var showMenu: Bool = false
     @AppStorage("isDarkModeEnabled") var isDarkModeEnabled:  Bool = false
+    @EnvironmentObject var viewModel: AuthViewModel
     
     @State var dragOffset : CGFloat = 0
     var body: some View {
@@ -102,14 +104,19 @@ struct MainInterFaceView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar{
             ToolbarItem(placement: .topBarLeading) {
-                Button(action: {
-                    withAnimation(.easeInOut){
-                        showMenu.toggle()
-                    }
-                }, label: {
-                    Circle()
-                        .frame(width: 32, height: 32)
-                })
+                if let user = viewModel.currentUser{
+                    Button(action: {
+                        withAnimation(.easeInOut){
+                            showMenu.toggle()
+                        }
+                    }, label: {
+                        KFImage(URL(string: user.profileImageUrl))
+                            .resizable()
+                            .scaledToFit()
+                            .clipShape(Circle())
+                            .frame(width: 32, height: 32)
+                    })
+                }
             }
         }
         .preferredColorScheme(isDarkModeEnabled ? .dark : .light)

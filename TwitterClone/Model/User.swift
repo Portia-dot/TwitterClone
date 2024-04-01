@@ -17,4 +17,5 @@ struct User: Identifiable, Decodable {
     let location: String
     let industry: String
     let email: String
+    let website: String
 }
