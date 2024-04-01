@@ -17,11 +17,13 @@ class AuthViewModel: ObservableObject {
     //Show LogOut Alert
     @Published var showLogOutAlert = false
     
+    private let service = UserService()
+    
     init(){
         self.userSession = Auth.auth().currentUser
         self.verifyUserSession()
+        self.fetchUser()
         
-        print("Debug: User session is \(String(describing: self.userSession))")
     }
     
     //Verify User Session
@@ -106,7 +108,7 @@ class AuthViewModel: ObservableObject {
     func uploadProfileImage(_ image: UIImage){
         guard let uid = tempUserSession?.uid else {return}
         ImageUploader.uploadImage(image: image) { profileImageUrl in
-            Firestore.firestore().collection("users")
+            Firestore.firestore().collection("user")
                 .document(uid)
                 .updateData(["profileImageUrl" : profileImageUrl]) { _ in
                 self.userSession = self.tempUserSession
@@ -138,5 +140,10 @@ class AuthViewModel: ObservableObject {
                 completion(true)
             }
         }
+    }
+    
+    func fetchUser() {
+        guard let uid = self.userSession?.uid else {return}
+        service.fetchUseR(withUid: uid)
     }
 }

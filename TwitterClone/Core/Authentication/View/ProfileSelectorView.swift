@@ -67,9 +67,9 @@ struct ProfileSelectorView: View {
                         print("\(String(describing: viewModel.tempUserSession?.uid))")
                         viewModel.updateUserDetails(uid: uid, bio: detailsViewModel.bio, industry: detailsViewModel.industry, location: detailsViewModel.location, website: detailsViewModel.website, dateOfBirth: detailsViewModel.dateOfBirth) { success in
                             if success{
-                                
+                               loadImage()
                             }else {
-                                
+                              print("error uploading user info and image")
                             }
                         }
                     }
