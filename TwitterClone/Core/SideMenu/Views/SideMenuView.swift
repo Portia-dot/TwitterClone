@@ -6,107 +6,113 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct SideMenuView: View {
     @Environment(\.appColorScheme) var appColorScheme
     @EnvironmentObject var viewModel: AuthViewModel
     var imageWidth: CGFloat = 24
     var body: some View {
-        VStack (alignment: .leading, spacing: 10) {
-            VStack(alignment: .leading) {
-                    Circle()
+        if let user = viewModel.currentUser{
+            VStack (alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading) {
+                    KFImage(URL(string: user.profileImageUrl))
+                        .resizable()
+                        .scaledToFit()
+                        .clipShape(Circle())
                         .frame(width: 48, height: 48)
-                
-                VStack(alignment: .leading, spacing: 4){
-                    HStack{
-                        Text("Bruce Lee")
-                            .font(.headline)
-                        Image(systemName: "checkmark.seal.fill")
-                            .foregroundStyle(Color(.systemYellow))
+                    
+                    VStack(alignment: .leading, spacing: 4){
+                        HStack{
+                            Text(user.fullname)
+                                .font(.headline)
+                            Image(systemName: "checkmark.seal.fill")
+                                .foregroundStyle(Color(.systemYellow))
+                        }
+                        Text("@\(user.username)")
+                            .font(.caption)
+                            .foregroundStyle(.gray)
                     }
-                    Text("@BruceLee")
-                        .font(.caption)
-                        .foregroundStyle(.gray)
+                    UserStatView()
+                   
                 }
-                UserStatView()
-               
-            }
-            .padding(.leading)
-            //Bars
-            
-            ForEach(SideMenuViewModel.allCases, id: \.rawValue){ option in
-                    HStack(spacing: 16) {
-                        Image(systemName: option.imageName)
-                            .frame(width: imageWidth, alignment: .center)
-                            .font(.title2)
-                            .foregroundStyle(.black)
-
-                        if option == .logout {
-                            Button(action: {
-                                viewModel.logout()
-                            }) {
-                                Text(option.description)
-                                    .font(.title2).bold()
-                                    .foregroundStyle(.black)
-                            }
-                            Spacer()
-                        } else if option == .profile {
-                            NavigationLink {
-                                ProfileView()
-                            } label: {
-                                Text(option.description)
-                                    .font(.title2).bold()
-                                    .foregroundStyle(.black)
-                            }
-                            Spacer()
-
-                            if option == .getPremium {
-                                Text("New")
-                                    .font(.caption)
-                                    .fontWeight(.bold)
-                                    .foregroundStyle(.white)
-                                    .padding(5)
-                                    .background(Color.blue)
-                                    .clipShape(RoundedRectangle(cornerRadius: 4))
-                            }
-                        } else {
-                            Text(option.description)
-                                .font(.title2).bold()
+                .padding(.leading)
+                //Bars
+                
+                ForEach(SideMenuViewModel.allCases, id: \.rawValue){ option in
+                        HStack(spacing: 16) {
+                            Image(systemName: option.imageName)
+                                .frame(width: imageWidth, alignment: .center)
+                                .font(.title2)
                                 .foregroundStyle(.black)
-                            Spacer()
-                            
-                            if option == .getPremium {
-                                Text("New")
-                                    .font(.caption)
-                                    .fontWeight(.bold)
-                                    .foregroundStyle(.white)
-                                    .padding(5)
-                                    .background(Color.blue)
-                                    .clipShape(RoundedRectangle(cornerRadius: 4))
+
+                            if option == .logout {
+                                Button(action: {
+                                    viewModel.logout()
+                                }) {
+                                    Text(option.description)
+                                        .font(.title2).bold()
+                                        .foregroundStyle(.black)
+                                }
+                                Spacer()
+                            } else if option == .profile {
+                                NavigationLink {
+                                    ProfileView()
+                                } label: {
+                                    Text(option.description)
+                                        .font(.title2).bold()
+                                        .foregroundStyle(.black)
+                                }
+                                Spacer()
+
+                                if option == .getPremium {
+                                    Text("New")
+                                        .font(.caption)
+                                        .fontWeight(.bold)
+                                        .foregroundStyle(.white)
+                                        .padding(5)
+                                        .background(Color.blue)
+                                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                                }
+                            } else {
+                                Text(option.description)
+                                    .font(.title2).bold()
+                                    .foregroundStyle(.black)
+                                Spacer()
+                                
+                                if option == .getPremium {
+                                    Text("New")
+                                        .font(.caption)
+                                        .fontWeight(.bold)
+                                        .foregroundStyle(.white)
+                                        .padding(5)
+                                        .background(Color.blue)
+                                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                                }
                             }
                         }
-                    }
-                    .frame(height: 40)
-                    .padding(.horizontal)
+                        .frame(height: 40)
+                        .padding(.horizontal)
 
+                }
+                .padding(.vertical, 4)
+                Divider()
+                //Setting and Supports
+                SettingAndPrivacy()
+                
+                Spacer()
+                darkAndLightMode()
+                    .padding(.horizontal)
+                    .padding(.bottom, 3)
             }
-            .padding(.vertical, 4)
-            Divider()
-            //Setting and Supports
-            SettingAndPrivacy()
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+            .background(Color.white)
+            .preferredColorScheme(appColorScheme)
+           
             
             Spacer()
-            darkAndLightMode()
-                .padding(.horizontal)
-                .padding(.bottom, 3)
+
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .background(Color.white)
-        .preferredColorScheme(appColorScheme)
-       
-        
-        Spacer()
-       
 
     }
 }

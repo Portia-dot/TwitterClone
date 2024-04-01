@@ -17,6 +17,9 @@ class AuthViewModel: ObservableObject {
     //Show LogOut Alert
     @Published var showLogOutAlert = false
     
+    //USER DATA
+    @Published var currentUser: User?
+    
     private let service = UserService()
     
     init(){
@@ -144,6 +147,8 @@ class AuthViewModel: ObservableObject {
     
     func fetchUser() {
         guard let uid = self.userSession?.uid else {return}
-        service.fetchUseR(withUid: uid)
+        service.fetchUser(withUid: uid){ user in
+            self.currentUser = user
+        }
     }
 }

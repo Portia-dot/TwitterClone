@@ -9,14 +9,14 @@ import FirebaseFirestoreSwift
 
 struct UserService{
     
-    func fetchUseR(withUid uid: String) {
+    func fetchUser(withUid uid: String, completion: @escaping (User) -> Void) {
         //Fetch Current User Information
         let db = Firestore.firestore()
         db.collection("user").document(uid).getDocument { snapshot, _ in
             guard let snapshot = snapshot else {return}
             
             guard let user = try? snapshot.data(as: User.self) else {return}
-            print("Debug: Username is \(user.username)")
+            completion(user)
             
         }
     }
