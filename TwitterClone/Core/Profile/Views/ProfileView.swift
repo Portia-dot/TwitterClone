@@ -2,22 +2,33 @@
 //  ProfileView.swift
 //  TwitterClone
 //
-//  Created by Modamori Oluwayomi on 2024-02-22.
+//  Created by Modamori Felix Noah on 2024-02-22.
 //
 
 import SwiftUI
+import Kingfisher
 
 struct ProfileView: View {
+    
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var viewModel : AuthViewModel
+    @State private var showingImagePicker = false
+    
+    
+    
    
     var body: some View {
-        VStack(alignment: .leading){
+        VStack(alignment: .leading, spacing: 10){
             headerView
-            ProfileButton()
-            UserInfo()
+            HStack{
+                UserInfo()
+                ProfileButton()
+                
+            }
+            .padding(.top)
             ProfessionalPart()
             ProfileLocAndLink()
-            UserStatView()
+            UserStatView(showFull: true)
                 .padding(.horizontal)
             TweetFilterBar()
             
@@ -26,22 +37,26 @@ struct ProfileView: View {
             Spacer()
             
         }
+        .navigationBarBackButtonHidden()
     }
 }
 
 #Preview {
     ProfileView()
+        .environmentObject(AuthViewModel())
 }
 
 
 //Extensions
 
 extension ProfileView {
+
     var headerView: some View {
+        //Modify To Allow Modification Of Cover Image
         ZStack(alignment: .bottomLeading, content: {
-            Color(.systemBlue)
-                .ignoresSafeArea()
-            
+                    Color.gray
+                        .ignoresSafeArea(edges: .top)
+                    
             //Profile Picture
             VStack {
                 //Back Button
@@ -52,12 +67,22 @@ extension ProfileView {
                     Image(systemName: "arrow.left")
                         .frame(width: 20, height: 16)
                         .foregroundStyle(.white)
-                        .offset(x: 16, y: 12)
+                        .offset(x: 16, y: -20)
                 })
                 
-                Circle()
-                .frame(width: 72, height: 72)
-                .offset(x:16, y: 24)
+                if let user = viewModel.currentUser{
+                    KFImage(URL(string: user.profileImageUrl))
+                        .resizable()
+                        .scaledToFit()
+                        .clipShape(Circle())
+                        .frame(width: 72, height: 72)
+                        .offset(x:16, y: 24)
+                }else{
+                    Circle()
+                        .frame(width: 72, height: 72)
+                        .offset(x:16, y: 24)
+                    
+                }
             }
         })
         .frame(height: 96)
@@ -109,11 +134,22 @@ struct UserInfo: View {
                     .font(.subheadline)
                     .foregroundStyle(.gray)
                 
-                //Bio
+            }
+            .padding(.horizontal)
+        }else{
+            VStack(alignment:.leading, spacing: 4){
+                HStack{
+                    Text("Sample")
+                        .font(.title2).bold()
+                    //Verification Badge
+                    
+                    Image(systemName: "checkmark.seal.fill")
+                        .foregroundStyle(Color(.systemYellow))
+                }
+                Text("@\("sampleUser")")
+                    .font(.subheadline)
+                    .foregroundStyle(.gray)
                 
-                Text(user.bio)
-                    .font(.subheadline).bold()
-                    .padding(.vertical)
             }
             .padding(.horizontal)
         }
@@ -131,20 +167,45 @@ struct ProfessionalPart: View {
                         .font(.subheadline).bold()
                         .foregroundStyle(.gray)
                     Spacer()
-                    
                     //Location
                     Button {
                         
                     } label: {
                         Image(systemName: "location")
+                            .foregroundStyle(.black)
                         Text(user.location)
                     }
                     .font(.subheadline).bold()
                     .foregroundStyle(.gray)
                     
                     Spacer()
+                }
+            }
+            .padding(.horizontal)
+            .padding(.bottom, 2)
+        }else{
+            VStack(alignment: .leading, spacing: 4) {
+                HStack{
+                    Image(systemName: "latch.2.case")
+                    Text("Industry")
+                        .font(.subheadline).bold()
+                        .foregroundStyle(.gray)
+                    Spacer()
+                    //Location
+                    Button {
+                        
+                    } label: {
+                        Image(systemName: "location")
+                            .foregroundStyle(.black)
+                        Text("Location")
+                    }
+                    .font(.subheadline).bold()
+                    .foregroundStyle(.gray)
+                    Spacer()
                     
                 }
+                
+                
             }
             .padding(.horizontal)
             .padding(.bottom, 2)
@@ -180,27 +241,53 @@ struct ProfileLocAndLink: View {
             }
             .padding(.horizontal)
             .padding(.bottom, 2)
+        }else {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack{
+                    Button {
+                        
+                    } label: {
+                        Image(systemName: "link")
+                        Text("website")
+                            .foregroundStyle(.blue)
+                    }
+                    .font(.subheadline).bold()
+                    .foregroundStyle(.black)
+                    
+                    Spacer()
+                    //Join Date
+                    Image(systemName: "birthday.cake")
+                    Text("Date Of Birth")
+                        .font(.subheadline).bold()
+                        .foregroundStyle(.gray)
+                    
+                    Spacer()
+                    
+                }
+            }
+            .padding(.horizontal)
+            .padding(.bottom, 2)
         }
     }
 }
 
-//struct FollowingDisPlay: View {
-//    var body: some View {
-//        HStack{
-//            Text("172")
-//                .font(.subheadline).bold()
-//            Text("Following")
-//                .font(.subheadline).bold()
-//                .foregroundStyle(.gray)
-//            Text("11.5M")
-//                .font(.subheadline).bold()
-//            Text("Followers")
-//                .font(.subheadline).bold()
-//                .foregroundStyle(.gray)
-//        }
-//        .padding()
-//    }
-//}
+struct FollowingDisPlay: View {
+    var body: some View {
+        HStack{
+            Text("172")
+                .font(.subheadline).bold()
+            Text("Following")
+                .font(.subheadline).bold()
+                .foregroundStyle(.gray)
+            Text("11.5M")
+                .font(.subheadline).bold()
+            Text("Followers")
+                .font(.subheadline).bold()
+                .foregroundStyle(.gray)
+        }
+        .padding()
+    }
+}
 
 struct TweetFilterBar: View {
     @State private var selectedFilter: TweetFilterViewModel = .tweets

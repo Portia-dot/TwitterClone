@@ -33,7 +33,7 @@ struct SideMenuView: View {
                             .font(.caption)
                             .foregroundStyle(.gray)
                     }
-                    UserStatView()
+                    UserStatView(showFull: false)
                    
                 }
                 .padding(.leading)
@@ -119,6 +119,7 @@ struct SideMenuView: View {
 
 #Preview {
     SideMenuView()
+        .environmentObject(AuthViewModel())
 }
 
 struct SettingAndPrivacy: View {

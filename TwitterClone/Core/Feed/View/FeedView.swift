@@ -9,6 +9,7 @@ import SwiftUI
 
 struct FeedView: View {
     @State private var showNewTweetView = false
+
     var body: some View {
         ZStack(alignment: .bottomTrailing){
             ScrollView {
@@ -40,4 +41,5 @@ struct FeedView: View {
 
 #Preview {
     FeedView()
+        .environmentObject(AuthViewModel())
 }

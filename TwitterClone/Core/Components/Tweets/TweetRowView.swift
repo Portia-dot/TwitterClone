@@ -6,26 +6,38 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct TweetRowView: View {
+    @EnvironmentObject var viewModel: AuthViewModel
     var body: some View {
         VStack {
             HStack(alignment: .top, spacing: 12) {
-                Circle()
+                if let user = viewModel.currentUser{
+                    KFImage(URL(string: user.profileImageUrl))
+                    .resizable()
+                    .scaledToFill()
                     .frame(width: 56, height: 56)
-                    .foregroundStyle(Color(.systemBlue))
+                    .clipShape(Circle())
+                }else{
+                    Circle()
+                        .frame(width: 56, height: 56)
+                }
                 
                 VStack(alignment: .leading , spacing: 4){
-                    HStack{
-                        Text("Bruce Lee")
-                            .font(.subheadline).bold()
-                        
-                        Text("@TimeTriping.")
-                            .foregroundStyle(.gray)
-                            .font(.caption)
-                        Text("6h")
-                            .foregroundStyle(.gray)
-                            .font(.caption)
+                    if let user = viewModel.currentUser {
+                        HStack{
+                            Text(user.fullname)
+                                .font(.subheadline).bold()
+                            
+                            Text("@\(user.username)")
+                                .foregroundStyle(.gray)
+                                .font(.caption)
+                            Text("6h")
+                                .foregroundStyle(.gray)
+                                .font(.caption)
+                        }
+
                     }
                     Text("First Tweet")
                         .font(.subheadline)
@@ -96,6 +108,7 @@ struct TweetRowView: View {
 
 #Preview {
     TweetRowView()
+        .environmentObject(AuthViewModel())
 }
 
 
