@@ -57,7 +57,7 @@ struct SideMenuView: View {
                                 Spacer()
                             } else if option == .profile {
                                 NavigationLink {
-                                    ProfileView()
+                                    ProfileView(user: user)
                                 } label: {
                                     Text(option.description)
                                         .font(.title2).bold()

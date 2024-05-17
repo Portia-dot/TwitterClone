@@ -8,16 +8,29 @@
 import SwiftUI
 
 struct FeedView: View {
+    @State private var selectedTweet: TweetViewModel?
     @State private var showNewTweetView = false
+    @EnvironmentObject var viewModel: AuthViewModel
+
 
     var body: some View {
         ZStack(alignment: .bottomTrailing){
             ScrollView {
-                LazyVStack{
-                    ForEach(0 ... 20 , id: \.self) { _ in
-                       TweetRowView() 
+                if viewModel.isLoadingTweets{
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle())
+                        .scaleEffect(2)
+                        .padding()
+                }else{
+                    LazyVStack{
+                        ForEach(viewModel.tweets, id: \.id) { tweet in
+                            TweetRowView(post: tweet)
+                        }
                     }
                 }
+            }
+            .onAppear{
+                viewModel.fetchTweets()
             }
             Button {
                 showNewTweetView.toggle()
@@ -33,13 +46,13 @@ struct FeedView: View {
             .clipShape(Circle())
             .padding()
             .fullScreenCover(isPresented: $showNewTweetView, content: {
-               NewTweetView()
+                NewTweetView(mode: .tweet)
             })
         }
     }
 }
 
-#Preview {
-    FeedView()
-        .environmentObject(AuthViewModel())
-}
+//#Preview {
+//    FeedView()
+//        .environmentObject(AuthViewModel())
+//}

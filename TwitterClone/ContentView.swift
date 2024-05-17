@@ -10,28 +10,23 @@ import Kingfisher
 
 struct ContentView: View {
     @EnvironmentObject var viewModel: AuthViewModel
+
     var body: some View {
-        Group{
-            //Means No User Logged In
+        Group {
             if viewModel.userSession == nil {
                 LoginView()
-            }else{
-                //No User Logged In
-                MainInterFaceView()
+            } else {
+              MainInterFaceView()
+
             }
         }
-        //Show Logout Alert Cos User Doesnt Exist
-        
-        .alert("Logged Out", isPresented: $viewModel.showLogOutAlert){
-            Button("Ok", role: .cancel){}
-        }message: {
-            Text("You have been logged out because you account longer exists")
-                .bold()
+        .alert("Logged Out", isPresented: $viewModel.showLogOutAlert) {
+            Button("Ok", role: .cancel) {}
+        } message: {
+            Text("You have been logged out because your account no longer exists")
         }
-        
     }
 }
-
 #Preview {
     ContentView()
         .environmentObject(AuthViewModel())
@@ -58,17 +53,19 @@ extension View {
 }
 
 struct MainInterFaceView: View {
+    
     @State var showMenu: Bool = false
+    @State var showSidebarToggle: Bool = true
     @AppStorage("isDarkModeEnabled") var isDarkModeEnabled:  Bool = false
     @EnvironmentObject var viewModel: AuthViewModel
     
     @State var dragOffset : CGFloat = 0
     var body: some View {
         ZStack(alignment: .topLeading){
-            MainTabView()
+            MainTabView(showSidebarToggle: $showSidebarToggle)
                 .conditionalToolbarHidden($showMenu)
             
-            if showMenu {
+            if showMenu && showSidebarToggle {
                 ZStack {
                     Color.black.opacity(showMenu ? 0.25 : 0.0)
                 }.onTapGesture {
@@ -101,17 +98,15 @@ struct MainInterFaceView: View {
                 )
             
         }
-        .navigationTitle("Home")
-        .navigationBarTitleDisplayMode(.inline)
         .toolbar{
             ToolbarItem(placement: .topBarLeading) {
-                if let user = viewModel.currentUser{
+                if showSidebarToggle && viewModel.currentUser != nil {
                     Button(action: {
                         withAnimation(.easeInOut){
                             showMenu.toggle()
                         }
                     }, label: {
-                        KFImage(URL(string: user.profileImageUrl))
+                        KFImage(URL(string: viewModel.currentUser!.profileImageUrl))
                             .resizable()
                             .scaledToFit()
                             .clipShape(Circle())

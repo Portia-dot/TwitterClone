@@ -20,4 +20,26 @@ struct UserService{
             
         }
     }
+    
+    func fetchUsers(completion: @escaping([User]?, Error?) -> Void){
+        Firestore.firestore().collection("user").getDocuments { snapshot, error in
+            
+            if let error = error {
+                print("Error featching users\(error.localizedDescription)")
+                completion(nil, error)
+            }
+            guard let documents = snapshot?.documents else {
+                print("No User Found")
+                completion([], nil)
+                return
+            }
+            let users = documents.compactMap { document -> User? in
+                try? document.data(as: User.self)
+            }
+            if users.isEmpty{
+                print("No User could be decoded because document is empty")
+            }
+            completion(users, nil)
+        }
+    }
 }

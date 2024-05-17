@@ -13,4 +13,6 @@ struct UserSearchVM: Identifiable {
     let name: String
     let userName: String
     //        let following: Bool
+    
+
 }

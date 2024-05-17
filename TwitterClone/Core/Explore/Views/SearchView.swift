@@ -11,15 +11,20 @@ struct SearchView: View {
     @State  var searchText = ""
     @State private var isSearching =  true
     @State private var selectedFilter: SearchFilterViewModel = .forYou
+    @ObservedObject var viewModel = ExploreViewModel()
     
+     
     
-    
-    let sampleUsers = [
-        UserSearchVM(id: 1, name: "Bruce Lee", userName: "@brucelee"),
-        UserSearchVM(id: 2, name: "John Doe", userName: "@johndoe"),
-    ]
-    
-    
+    var filterUsers: [User]{
+        if searchText.isEmpty{
+            return viewModel.users
+        }else{
+            return viewModel.users.filter{ user in
+                user.fullname.lowercased().contains(searchText.lowercased()) || user.username.lowercased().contains(searchText.lowercased())
+            }
+                                          
+        }
+    }
     
     var body: some View {
         NavigationStack{
@@ -45,14 +50,14 @@ struct SearchView: View {
     
     var topBar: some View {
         HStack {
-            Image(systemName: "person")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 20, height: 20)
-                .padding(.all, 5)
-                .clipShape(Circle())
-                .overlay(Circle().stroke(lineWidth: 1.0))
-            Spacer()
+//            Image(systemName: "person")
+//                .resizable()
+//                .scaledToFit()
+//                .frame(width: 20, height: 20)
+//                .padding(.all, 5)
+//                .clipShape(Circle())
+//                .overlay(Circle().stroke(lineWidth: 1.0))
+//            Spacer()
             //Search Bar
             HStack {
                 TextField("Search", text: $searchText)
@@ -151,23 +156,28 @@ struct SearchView: View {
     }
     
     var searchResults: some View {
-        ScrollView {
-            LazyVStack {
-                ForEach(sampleUsers) { user in
-                    NavigationLink{
-                        ProfileView()
-                    } label: {
-                        UserSearchRow(viewModel: user)
+        VStack {
+            ScrollView {
+                LazyVStack {
+                    ForEach(filterUsers) { user in
+                        NavigationLink {ProfileView(user: user)}
+                    label:{
+                            UserSearchRow(user: user)
+                                }
+                        }
                     }
-                }
             }
+        }
+        .navigationTitle("Explore")
+        .navigationBarTitleDisplayMode(.inline)
+        
         }
     }
 
-}
 
 #Preview {
     SearchView()
+        .environmentObject(AuthViewModel())
 }
 
 

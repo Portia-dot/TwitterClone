@@ -6,10 +6,18 @@
 //
 
 import SwiftUI
+import Kingfisher
+
+enum PostMode{
+    case tweet, comment
+}
 
 struct NewTweetView: View {
+    @EnvironmentObject var viewModel: AuthViewModel
     @State private var caption = ""
     @Environment(\.dismiss) var dismiss
+    var tweetID: String?
+    var mode: PostMode
     
     var body: some View {
         NavigationView {
@@ -25,9 +33,33 @@ struct NewTweetView: View {
                     Spacer()
                     
                     Button(action: {
-                        print("Tweet")
+                        switch mode{
+                        case .tweet:
+                            viewModel.postTweet(caption: caption) {tweetID, success in
+                                if success{
+                                    dismiss()
+                                }else{
+                                    //Handle This Later
+                                    print("Error")
+                                }
+                            }
+                        case .comment:
+                            if let tweetID = self.tweetID{
+                                viewModel.postComment(tweetID : tweetID, caption: caption)  {
+                                    success in
+                                    if success{
+                                        dismiss()
+                                    }else{
+                                        //Handle This Later
+                                        print("Error")
+                                    }
+                                }
+                            }else{
+                                print("Tweet Id is missing")
+                            }
+                        }
                     }) {
-                        Text("Tweet")
+                        Text(mode == .tweet ? "Tweet" : "Comment")
                             .bold()
                             .foregroundColor(.white)
                             .padding(.horizontal)
@@ -39,10 +71,14 @@ struct NewTweetView: View {
                 .padding()
                 
                 HStack(alignment: .top) {
-                    Circle()
-                        .frame(width: 64, height: 64)
-//                        .foregroundColor(Color.gray.opacity(0.5))
-                    
+                    if let user = viewModel.currentUser{
+                        KFImage(URL(string: user.profileImageUrl))
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 64, height: 64)
+                            .clipShape(Circle())
+                    }
+    
                     TextArea("What's happening?", text: $caption)
                         .frame(minHeight: 100)
                         .bold()
@@ -58,5 +94,6 @@ struct NewTweetView: View {
 
 
 #Preview {
-    NewTweetView()
+    NewTweetView(mode: .comment)
+        .environmentObject(AuthViewModel())
 }

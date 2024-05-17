@@ -6,19 +6,24 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct UserSearchRow: View {
-    let viewModel : UserSearchVM
+    
+    let user: User
     var body: some View {
         HStack (spacing: 4) {
-            Circle()
+            KFImage(URL(string: user.profileImageUrl))
+                .resizable()
+                .clipShape(Circle())
+                .scaledToFit()
                 .frame(width: 48, height: 48)
             
             VStack(alignment: .leading, spacing: 4) {
-                Text(viewModel.name)
+                Text(user.username)
                     .font(.subheadline).bold()
                     .foregroundStyle(.black)
-                Text(viewModel.userName)
+                Text(user.fullname)
                     .font(.subheadline)
                     .foregroundStyle(.gray)
             }
@@ -29,6 +34,4 @@ struct UserSearchRow: View {
     }
 }
 
-#Preview {
-    UserSearchRow(viewModel: UserSearchVM(id: 1, name: "John Doe", userName: "@Jdoe"))
-}
+

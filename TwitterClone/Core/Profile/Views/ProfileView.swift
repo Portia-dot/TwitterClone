@@ -9,42 +9,39 @@ import SwiftUI
 import Kingfisher
 
 struct ProfileView: View {
-    
+    let user: User
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var viewModel : AuthViewModel
     @State private var showingImagePicker = false
-    
-    
+
     
    
     var body: some View {
         VStack(alignment: .leading, spacing: 10){
             headerView
             HStack{
-                UserInfo()
-                ProfileButton()
+                UserInfo(user: user)
+                ProfileButton(user: user)
                 
             }
             .padding(.top)
-            ProfessionalPart()
-            ProfileLocAndLink()
+            UserAndProfessionalDetailsView(user: user)
             UserStatView(showFull: true)
                 .padding(.horizontal)
             TweetFilterBar()
             
             //Tweet Display
-            TweetView()
-            Spacer()
-            
+            TweetView(user: user)
+
         }
         .navigationBarBackButtonHidden()
     }
 }
-
-#Preview {
-    ProfileView()
-        .environmentObject(AuthViewModel())
-}
+//
+//#Preview {
+//    ProfileView()
+//        .environmentObject(AuthViewModel())
+//}
 
 
 //Extensions
@@ -67,32 +64,27 @@ extension ProfileView {
                     Image(systemName: "arrow.left")
                         .frame(width: 20, height: 16)
                         .foregroundStyle(.white)
-                        .offset(x: 16, y: -20)
+                        .offset(x: 16, y: -4)
                 })
                 
-                if let user = viewModel.currentUser{
                     KFImage(URL(string: user.profileImageUrl))
                         .resizable()
                         .scaledToFit()
                         .clipShape(Circle())
                         .frame(width: 72, height: 72)
                         .offset(x:16, y: 24)
-                }else{
-                    Circle()
-                        .frame(width: 72, height: 72)
-                        .offset(x:16, y: 24)
-                    
-                }
             }
         })
-        .frame(height: 96)
+        .frame(height: 100)
     }
 }
 
 //Profile Buttons
 struct ProfileButton: View {
+    let user: User
+    @EnvironmentObject var viewModel: AuthViewModel
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 4) {
             Spacer()
             //Message Bell
             Image(systemName: "envelope")
@@ -101,16 +93,14 @@ struct ProfileButton: View {
                 .overlay(Circle().stroke(Color.gray, lineWidth: 0.75))
             //Subscribe
             CustomProfileIcon()
-            //Edit Profile
-            Button {
-                
-            } label: {
-                Text("Edit Profile")
-                    .font(.subheadline).bold()
-                    .frame(width: 120, height: 32)
-                    .foregroundStyle(.black)
-                    .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.gray, lineWidth: 0.75))
+            //Conditional Edit Profile
+            Spacer()
+            if viewModel.currentUser? .id == user.id {
+                editProfileButton
             }
+            
+            Spacer()
+
             
         }
         .padding(.trailing)
@@ -118,13 +108,15 @@ struct ProfileButton: View {
 }
 
 struct UserInfo: View {
-    @EnvironmentObject var viewModel: AuthViewModel
+    let user: User
     var body: some View {
-        if let user = viewModel.currentUser{
             VStack(alignment:.leading, spacing: 4){
                 HStack{
                     Text(user.fullname)
                         .font(.title2).bold()
+                        .lineLimit(1)
+                        .fixedSize(horizontal: true, vertical: false)
+                        .font(user.fullname.count > 20 ? .headline : .title2)
                     //Verification Badge
                     
                     Image(systemName: "checkmark.seal.fill")
@@ -136,138 +128,56 @@ struct UserInfo: View {
                 
             }
             .padding(.horizontal)
-        }else{
-            VStack(alignment:.leading, spacing: 4){
-                HStack{
-                    Text("Sample")
-                        .font(.title2).bold()
-                    //Verification Badge
-                    
-                    Image(systemName: "checkmark.seal.fill")
-                        .foregroundStyle(Color(.systemYellow))
-                }
-                Text("@\("sampleUser")")
-                    .font(.subheadline)
-                    .foregroundStyle(.gray)
-                
-            }
-            .padding(.horizontal)
-        }
     }
 }
 
-struct ProfessionalPart: View {
-    @EnvironmentObject var viewModel: AuthViewModel
+struct UserAndProfessionalDetailsView: View {
+    let user: User
     var body: some View {
-        if let user =  viewModel.currentUser{
-            VStack(alignment: .leading, spacing: 4) {
-                HStack{
-                    Image(systemName: "latch.2.case")
-                    Text(user.industry)
-                        .font(.subheadline).bold()
-                        .foregroundStyle(.gray)
-                    Spacer()
-                    //Location
-                    Button {
-                        
-                    } label: {
-                        Image(systemName: "location")
-                            .foregroundStyle(.black)
-                        Text(user.location)
+        VStack(alignment: .leading) {
+            HStack(spacing: 10){
+                VStack(alignment: .leading, content: {
+                    HStack{
+                        Image(systemName: "latch.2.case")
+                            .foregroundStyle(.gray)
+                        Text(user.industry)
+                            .font(.caption).bold()
+                            .foregroundStyle(.gray)
                     }
-                    .font(.subheadline).bold()
-                    .foregroundStyle(.gray)
                     
-                    Spacer()
-                }
-            }
-            .padding(.horizontal)
-            .padding(.bottom, 2)
-        }else{
-            VStack(alignment: .leading, spacing: 4) {
-                HStack{
-                    Image(systemName: "latch.2.case")
-                    Text("Industry")
-                        .font(.subheadline).bold()
-                        .foregroundStyle(.gray)
-                    Spacer()
-                    //Location
-                    Button {
-                        
-                    } label: {
-                        Image(systemName: "location")
-                            .foregroundStyle(.black)
-                        Text("Location")
-                    }
-                    .font(.subheadline).bold()
-                    .foregroundStyle(.gray)
-                    Spacer()
-                    
-                }
-                
-                
-            }
-            .padding(.horizontal)
-            .padding(.bottom, 2)
-        }
-    }
-}
-
-struct ProfileLocAndLink: View {
-    @EnvironmentObject var viewModel: AuthViewModel
-    var body: some View {
-        if let user = viewModel.currentUser{
-            VStack(alignment: .leading, spacing: 4) {
-                HStack{
-                    Button {
-                        
-                    } label: {
+                    HStack{
                         Image(systemName: "link")
+                            .foregroundStyle(.gray)
                         Text(user.website)
                             .foregroundStyle(.blue)
+                            .font(.caption).bold()
                     }
-                    .font(.subheadline).bold()
-                    .foregroundStyle(.black)
-                    Spacer()
                     
-                    //Join Date
-                    Image(systemName: "birthday.cake")
-                    Text(user.dateOfBirth)
-                        .font(.subheadline).bold()
-                        .foregroundStyle(.gray)
-                    Spacer()
-                    
-                }
-            }
-            .padding(.horizontal)
-            .padding(.bottom, 2)
-        }else {
-            VStack(alignment: .leading, spacing: 4) {
-                HStack{
-                    Button {
-                        
-                    } label: {
-                        Image(systemName: "link")
-                        Text("website")
-                            .foregroundStyle(.blue)
+                })
+                Spacer()
+                VStack(alignment: .leading, content: {
+                    HStack{
+                        Image(systemName: "location")
+                            .foregroundStyle(.gray)
+                        Text(user.location)
+                            .font(.caption).bold()
+                            .foregroundStyle(.gray)
                     }
-                    .font(.subheadline).bold()
-                    .foregroundStyle(.black)
                     
-                    Spacer()
-                    //Join Date
-                    Image(systemName: "birthday.cake")
-                    Text("Date Of Birth")
-                        .font(.subheadline).bold()
-                        .foregroundStyle(.gray)
+                    HStack{
+                        Image(systemName: "birthday.cake")
+                            .foregroundStyle(.gray)
+                        Text(user.dateOfBirth)
+                            .foregroundStyle(.gray)
+                            .font(.caption).bold()
+                    }
                     
-                    Spacer()
-                    
-                }
+                })
+                Spacer()
             }
-            .padding(.horizontal)
-            .padding(.bottom, 2)
         }
+        .padding(.horizontal)
+        .padding(.bottom, 2)
     }
 }
 
@@ -330,13 +240,32 @@ struct TweetFilterBar: View {
 }
 
 struct TweetView: View {
+    @EnvironmentObject var viewModel : AuthViewModel
+    
+
+    var user: User
     var body: some View {
         ScrollView{
-            LazyVStack {
-                ForEach(0 ... 9, id: \.self) { _ in
-                    TweetRowView()
+            LazyVStack{
+                ForEach(viewModel.tweets, id: \.id) { tweet in
+                    TweetRowView(post: tweet)
                 }
             }
         }
+        .onAppear(perform: {
+            viewModel.fetchTweets(for: user.id)
+        })
+    }
+}
+
+var editProfileButton: some View{
+    Button {
+        
+    } label: {
+        Text("Edit Profile")
+            .font(.subheadline).bold()
+            .frame(width: 90, height: 32)
+            .foregroundStyle(.black)
+            .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.gray, lineWidth: 0.75))
     }
 }

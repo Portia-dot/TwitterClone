@@ -27,12 +27,14 @@ struct ExploreView: View {
                 //Search Bar
                 SearchView()
             }
+            .navigationTitle("Explore")
         }
     }
 }
 
 #Preview {
     ExploreView()
+        .environmentObject(AuthViewModel())
 }
 
 struct TrendingTopic {

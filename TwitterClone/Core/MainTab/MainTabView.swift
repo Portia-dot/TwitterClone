@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MainTabView: View {
     @State private var selectedIndex = 0
+    @Binding var showSidebarToggle: Bool
     var body: some View {
         TabView(selection: $selectedIndex) {
             FeedView()
@@ -17,14 +18,19 @@ struct MainTabView: View {
                 }
                 .tabItem { Image(systemName: "house") }
                 .tag(0)
+                .onAppear { self.showSidebarToggle = true }
+
             //Second
             
-            ExploreView()
+            SearchView()
                 .onTapGesture {
                     self.selectedIndex = 1
                 }
                 .tabItem { Image(systemName: "magnifyingglass") }
                 .tag(1)
+                .onAppear { self.showSidebarToggle = false }
+
+
             //Grok
             GrokView()
                 .onTapGesture {
@@ -32,6 +38,8 @@ struct MainTabView: View {
                 }
                 .tabItem { Image(systemName: "pencil.and.scribble") }
                 .tag(2)
+                .onAppear { self.showSidebarToggle = true }
+
             
             //Notification
             
@@ -41,6 +49,8 @@ struct MainTabView: View {
                 }
                 .tabItem { Image(systemName: "bell") }
                 .tag(3)
+                .onAppear { self.showSidebarToggle = true }
+
             //Inbox
             
             MessagesView()
@@ -49,10 +59,14 @@ struct MainTabView: View {
                 }
                 .tabItem { Image(systemName: "envelope") }
                 .tag(4)
+                .onAppear { self.showSidebarToggle = true }
+
         }
     }
 }
 
-#Preview {
-    MainTabView()
-}
+//#Preview {
+//    @State private var showSidebarToggle: Bool = true
+//    MainTabView(showSidebarToggle: $showSidebarToggle)
+//        .environmentObject(AuthViewModel())
+//}
